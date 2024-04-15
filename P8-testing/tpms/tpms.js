@@ -145,9 +145,9 @@ tpms= {
   find:(rp,sl)=>{
     //if (!this.try && this.status!="SCANNING") this.try=this.def.try
     NRF.findDevices(function(devices) {
-      devicesFilter = NRF.filterDevices(devices, {filters : [{services:[ "fbb0" ]}] });
+      devicesFilter = NRF.filterDevices(devices, [{services:[ "fbb0" ]}] );
       tpms.type1(devicesFilter);
-      devicesFilter = NRF.filterDevices(devices, {filters : [{services:[ "27a5" ]}] });
+      devicesFilter = NRF.filterDevices(devices, [{services:[ "27a5" ]}] );
       tpms.type2(devicesFilter);
 
       devices=[ ];
