@@ -30,6 +30,7 @@ face[0] = {
       if (tm < 86400){if(tm<60){ago=tm+"''";}else if(tm<3600){ago=((tm/60)|0)+"'";}else{ago=new Date(tm*1000).toISOString().substr(11,5).split(":");ago=Number(ago[0])+"h "+ago[1]+"'";}}else {ago=(new Date(this.log[tpms.def.ref].time*1000).toString().substr(4,17)).split(" ");ago=ago[0]+" "+ago[1]+" "+ago[3];}
       //info
       this.sel(this.log[tpms.def.ref][tpms.def.metric] ,ago,(tm < 86400)?"AGO":0);
+      if (ew.is.bt===2) console.log(this.log);
       let cl=((getTime()|0) - this.log[0].time < 1800)?1:0;
       //top
       this.btn(cl,this.tpms[tpms.def.pos],35,75,13,(this.log[0].psi < tpms.def.list[this.tpms[tpms.def.pos]].lowP ||  tpms.def.list[this.tpms[tpms.def.pos]].hiP < this.log[0].psi )?13:4,1,0,0,149,50); //device
