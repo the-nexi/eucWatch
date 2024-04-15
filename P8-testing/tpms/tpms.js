@@ -31,7 +31,7 @@ tpms= {
     if (tpms.tid) {clearTimeout(tpms.tid); tpms.tid=0;}
     tpms.find();
   },
-  type1:(device)=>{
+  type1:(devices)=>{
     devices.forEach(function(device) {
       if (device != [ ] && device.id ) {
         let mac=device.id.split(" ")[0].split(":");
@@ -86,7 +86,7 @@ tpms= {
       }
     });
   },
-  type2:(device)=>{
+  type2:(devices)=>{
     devices.forEach(function(device) {
       if (device != [ ] && device.id ) {
         let mac=device.id.split(" ")[0].split(":");
