@@ -49,13 +49,17 @@ tpms= {
             let time=getTime()|0;
             let alrm=0;
             let dev={};
+            let d = new DataView(device.manufacturerData);
+            //let kpa=(device.manufacturerData[6]|device.manufacturerData[7]<<8|device.manufacturerData[8]<<16|device.manufacturerData[9]<<24)/1000;
+            let kpa=d.getUint32(6)/1000;
             dev={
               "id":id,
               "pos":mac[0][1],
-              "kpa":((device.manufacturerData[6]|device.manufacturerData[7]<<8|device.manufacturerData[8]<<16|device.manufacturerData[9]<<24)/1000).toFixed(2),
-              "bar":((device.manufacturerData[6]|device.manufacturerData[7]<<8|device.manufacturerData[8]<<16|device.manufacturerData[9]<<24)/100000).toFixed(2),
-              "psi":(((device.manufacturerData[6]|device.manufacturerData[7]<<8|device.manufacturerData[8]<<16|device.manufacturerData[9]<<24)/1000)*0.1450377377).toFixed(2),
-              "temp":((device.manufacturerData[10]|device.manufacturerData[11]<<8|device.manufacturerData[12]<<16|device.manufacturerData[13]<<24)/100).toFixed(2),
+              "kpa":kpa.toFixed(2),
+              "bar":(kpa/100).toFixed(2),
+              "psi":(kpa*0.1450377377).toFixed(2),
+              //"temp":((device.manufacturerData[10]|device.manufacturerData[11]<<8|device.manufacturerData[12]<<16|device.manufacturerData[13]<<24)/100).toFixed(2),
+              "temp":(d.getInt32(10/100)).toFixed(2),
               "batt":device.manufacturerData[14],
               //"volt":((330-(dev.batt/1.725))/100).toFixed(2),
               "alrm":device.manufacturerData[15],
@@ -105,11 +109,11 @@ tpms= {
             let alrm=0;
             let dev={};
             let d = new DataView(device.data);
-            let psi = (((device.data[13]<<8|device.data[14])-145)/10).toFixed(1);
+            let psi = (((device.data[13]<<8|device.data[14])-145)/10);
             dev={
               "id":id,
               "pos":mac[1][0],
-              "psi":psi,
+              "psi":psi.toFixed(1),
               "kpa":(psi/0,1450377377).toFixed(1),
               "bar":(psi/14,50377377).toFixed(2),
               "temp":(d.getInt8(12)).toFixed(0),
