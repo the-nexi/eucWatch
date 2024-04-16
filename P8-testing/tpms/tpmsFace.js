@@ -336,7 +336,19 @@ touchHandler[0]=function(e,x,y){
         face[0].info=0;
         let tm=(getTime()|0) - face[0].log[tpms.def.ref].time;
         let ago=0;
-        if (tm < 86400){if(tm<60){ago=tm+"''";}else if(tm<3600){ago=((tm/60)|0)+"'";}else{ago=new Date(tm*1000).toISOString().substr(11,5).split(":");ago=Number(ago[0])+"h "+ago[1]+"'";}}else {ago=(new Date(face[0].log[tpms.def.ref].time*1000).toString().substr(4,17)).split(" ");ago=ago[0]+" "+ago[1]+" "+ago[3];}
+        if (tm < 86400){
+          if(tm<60){
+            ago=tm+"''";
+          }else if(tm<3600){
+            ago=((tm/60)|0)+"'";
+          }else{
+            ago=new Date(tm*1000).toISOString().substr(11,5).split(":");
+            ago=Number(ago[0])+"h "+ago[1]+"'";
+          }
+        }else {
+          ago=(new Date(face[0].log[tpms.def.ref].time*1000).toString().substr(4,17)).split(" ");
+          ago=ago[0]+" "+ago[1]+" "+ago[3];
+        }
         face[0].sel(face[0].log[tpms.def.ref][tpms.def.metric],ago,(tm < 86400)?"AGO":0);
         return;
       } else {

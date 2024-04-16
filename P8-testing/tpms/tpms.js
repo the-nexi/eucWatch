@@ -68,7 +68,7 @@ tpms= {
       "psi":psi.toFixed(1),
       "kpa":(psi/0.1450377377).toFixed(1),
       "bar":(psi/14.50377377).toFixed(2),
-      "temp":(d.getInt8(12)).toFixed(0),
+      "temp":(d.getInt8(12)).toFixed(1),
       "volt":(d.getInt8(11)/10).toFixed(1),
       "batt":(((d.getInt8(11)-20)*100)/13).toFixed(0),
       "alrm":(device.data[10]&0x80)>>7,
