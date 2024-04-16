@@ -105,15 +105,16 @@ tpms= {
             let alrm=0;
             let dev={};
             let d = new DataView(device.data);
+            let psi = (((device.data[13]<<8|device.data[14])-145)/10).toFixed(1);
             dev={
               "id":id,
               "pos":mac[1][0],
-              "psi":(((device.data[13]<<8|device.data[14])-145)/10).toFixed(1),
-              "kpa":(dev.psi/0,1450377377).toFixed(1),
-              "bar":(dev.kpa/100).toFixed(2),
+              "psi":psi,
+              "kpa":(psi/0,1450377377).toFixed(1),
+              "bar":(psi/14,50377377).toFixed(2),
               "temp":(d.getInt8(12)).toFixed(0),
               "volt":(d.getInt8(11)/10).toFixed(1),
-              "batt":(((dev.volt-2)*1000)/13).toFixed(0),
+              "batt":(((d.getInt8(11)-20)*100)/13).toFixed(0),
               "alrm":(device.data[10]&0x80)>>7,
               "time":time,
             };
