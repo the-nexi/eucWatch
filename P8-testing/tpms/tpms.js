@@ -83,7 +83,7 @@ tpms= {
         devicesFilter = NRF.filterDevices(devices, [{services:[ service ]}] );
         devicesFilter.forEach(function(device) {
           if (device == [ ] || !device.id ) return;
-          let dev = eval("type_" + service + "(device)");
+          let dev = eval("tpms.type_" + service + "(device)");
           if (!dev) return;
           if (!tpms.def.allowNew && !tpms.def.list[dev.id]) return;
           if (!tpms.def.list[dev.id]) {
