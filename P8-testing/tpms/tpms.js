@@ -80,10 +80,11 @@ tpms= {
     let serviceLst = ["fbb0", "27a5"];
     NRF.findDevices(function(devices) {
       serviceLst.forEach(function(service) {
+        let parseFunc = new Function("device", "return tpms.type_" + service + "(device)");
         devicesFilter = NRF.filterDevices(devices, [{services:[ service ]}] );
         devicesFilter.forEach(function(device) {
           if (device == [ ] || !device.id ) return;
-          let dev = eval("tpms.type_" + service + "(device)");
+          let dev = parseFunc(device);
           if (!dev) return;
           if (!tpms.def.allowNew && !tpms.def.list[dev.id]) return;
           if (!tpms.def.list[dev.id]) {
