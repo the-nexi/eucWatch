@@ -31,131 +31,90 @@ tpms= {
     if (tpms.tid) {clearTimeout(tpms.tid); tpms.tid=0;}
     tpms.find();
   },
-  type1:(devices)=>{
-    devices.forEach(function(device) {
-      if (device != [ ] && device.id ) {
-        let mac=device.id.split(" ")[0].split(":");
-        if (mac[1]+mac[2] == "eaca") {
-          let id=mac[3]+mac[4]+mac[5];
-          if ( tpms.def.allowNew || tpms.def.list[id] ) {
-            if (!tpms.def.list[id]) {
-              tpms.def.list[id]={"hiP":50,"lowP":10};
-              let got=require("Storage").readJSON("tpms.json",1);
-              got.def=tpms.def;
-              require("Storage").writeJSON("tpms.json",got);
-              got=0;
-            }
-            tpms.def.ref=0;
-            let time=getTime()|0;
-            let alrm=0;
-            let dev={};
-            let d = new DataView(device.manufacturerData);
-            //let kpa=(device.manufacturerData[6]|device.manufacturerData[7]<<8|device.manufacturerData[8]<<16|device.manufacturerData[9]<<24)/1000;
-            let kpa=d.getUint32(6,true)/1000;
-            dev={
-              "id":id,
-              "pos":mac[0][1],
-              "kpa":kpa.toFixed(2),
-              "bar":(kpa/100).toFixed(2),
-              "psi":(kpa*0.1450377377).toFixed(2),
-              //"temp":((device.manufacturerData[10]|device.manufacturerData[11]<<8|device.manufacturerData[12]<<16|device.manufacturerData[13]<<24)/100).toFixed(2),
-              "temp":(d.getInt32(10,true)/100).toFixed(2),
-              "batt":d.getUint8(14),
-              //"volt":((330-(dev.batt/1.725))/100).toFixed(2),
-              "alrm":device.manufacturerData[15],
-              "time":time,
-            };
-            device=[ ];
-            tpms.new++;
-            //tpms.new.time=time;
-            if (dev.psi<tpms.def.list[id].lowP) {
-              alrm=1;
-              if (euc.state=="READY") euc.dash.alrt.warn.txt="LOW PRESSURE";
-              handleInfoEvent({"src":"TPMS","title":id,"body":"LOW PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
-            } else if (tpms.def.list[id].hiP <=dev.psi) {
-              alrm=2;
-              if (euc.state=="READY") euc.dash.alrt.warn.txt="HI PRESSURE";
-              handleInfoEvent({"src":"TPMS","title":id,"body":"HI PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
-            } else alrm=0;
-            if (euc.state!="OFF") tpms.euc[id]={"time":time,"alrm":alrm,"psi":dev.psi};
-            let log=(require("Storage").readJSON("tpmsLog"+id+".json",1))?require("Storage").readJSON("tpmsLog"+id+".json",1):[];
-            log.unshift(dev);
-            if (10<log.length) log.pop();
-            require("Storage").writeJSON("tpmsLog"+id+".json",log);
-            log=0;
-            dev=0;
-            tpms.def.id=id;
-          }
-        }
-      }
-    });
+  type_fbb0:(device)=>{
+    let mac=device.id.split(" ")[0].split(":");
+    if (mac[1]+mac[2] != "eaca") return;
+    let id=mac[3]+mac[4]+mac[5];
+    let time=getTime()|0;
+    let alrm=0;
+    let dev={};
+    let d = new DataView(device.manufacturerData);
+    let kpa=d.getUint32(6,true)/1000;
+    dev={
+      "id":id,
+      "pos":mac[0][1],
+      "kpa":kpa.toFixed(2),
+      "bar":(kpa/100).toFixed(2),
+      "psi":(kpa*0.1450377377).toFixed(2),
+      "temp":(d.getInt32(10,true)/100).toFixed(2),
+      "batt":d.getUint8(14),
+      "alrm":device.manufacturerData[15],
+      "time":time,
+    };
+    return dev;
   },
-  type2:(devices)=>{
-    devices.forEach(function(device) {
-      if (device != [ ] && device.id ) {
-        let mac=device.id.split(" ")[0].split(":");
-        if (mac[0]+mac[2]+mac[3] == "d80000") {
-          let id=mac[1]+mac[4]+mac[5];
-          if ( tpms.def.allowNew || tpms.def.list[id] ) {
-            if (!tpms.def.list[id]) {
-              tpms.def.list[id]={"hiP":50,"lowP":10};
-              let got=require("Storage").readJSON("tpms.json",1);
-              got.def=tpms.def;
-              require("Storage").writeJSON("tpms.json",got);
-              got=0;
-            }
-            tpms.def.ref=0;
-            let time=getTime()|0;
-            let alrm=0;
-            let dev={};
-            let d = new DataView(device.data);
-            //let psi = ((device.data[13]<<8|device.data[14])-145)/10;
-            let psi = (d.getUint16(13)-145)/10;
-            dev={
-              "id":id,
-              "pos":mac[1][0],
-              "psi":psi.toFixed(1),
-              "kpa":(psi/0,1450377377).toFixed(1),
-              "bar":(psi/14,50377377).toFixed(2),
-              "temp":(d.getInt8(12)).toFixed(0),
-              "volt":(d.getInt8(11)/10).toFixed(1),
-              "batt":(((d.getInt8(11)-20)*100)/13).toFixed(0),
-              "alrm":(device.data[10]&0x80)>>7,
-              "time":time,
-            };
-            device=[ ];
-            tpms.new++;
-            //tpms.new.time=time;
-            if (dev.psi<tpms.def.list[id].lowP) {
-              alrm=1;
-              if (euc.state=="READY") euc.dash.alrt.warn.txt="LOW PRESSURE";
-              handleInfoEvent({"src":"TPMS","title":id,"body":"LOW PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
-            } else if (tpms.def.list[id].hiP <=dev.psi) {
-              alrm=2;
-              if (euc.state=="READY") euc.dash.alrt.warn.txt="HI PRESSURE";
-              handleInfoEvent({"src":"TPMS","title":id,"body":"HI PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
-            } else alrm=0;
-            if (euc.state!="OFF") tpms.euc[id]={"time":time,"alrm":alrm,"psi":dev.psi};
-            let log=(require("Storage").readJSON("tpmsLog"+id+".json",1))?require("Storage").readJSON("tpmsLog"+id+".json",1):[];
-            log.unshift(dev);
-            if (10<log.length) log.pop();
-            require("Storage").writeJSON("tpmsLog"+id+".json",log);
-            log=0;
-            dev=0;
-            tpms.def.id=id;
-          }
-        }
-      }
-    });
+  type_27a5:(device)=>{
+    let mac=device.id.split(" ")[0].split(":");
+    if (mac[0]+mac[2]+mac[3] != "d80000") return;
+    let id=mac[1]+mac[4]+mac[5];
+    let time=getTime()|0;
+    let alrm=0;
+    let dev={};
+    let d = new DataView(device.data);
+    let psi = (d.getUint16(13)-145)/10;
+    dev={
+      "id":id,
+      "pos":mac[1][0],
+      "psi":psi.toFixed(1),
+      "kpa":(psi/0,1450377377).toFixed(1),
+      "bar":(psi/14,50377377).toFixed(2),
+      "temp":(d.getInt8(12)).toFixed(0),
+      "volt":(d.getInt8(11)/10).toFixed(1),
+      "batt":(((d.getInt8(11)-20)*100)/13).toFixed(0),
+      "alrm":(device.data[10]&0x80)>>7,
+      "time":time,
+    };
+    return dev;
   },
   find:(rp,sl)=>{
-    //if (!this.try && this.status!="SCANNING") this.try=this.def.try
+    let serviceLst = ["fbb0", "27a5"];
     NRF.findDevices(function(devices) {
-      devicesFilter = NRF.filterDevices(devices, [{services:[ "fbb0" ]}] );
-      tpms.type1(devicesFilter);
-      devicesFilter = NRF.filterDevices(devices, [{services:[ "27a5" ]}] );
-      tpms.type2(devicesFilter);
-
+      serviceLst.forEach(function(service) {
+        devicesFilter = NRF.filterDevices(devices, [{services:[ service ]}] );
+        devicesFilter.forEach(function(device) {
+          if (device == [ ] || !device.id ) return;
+          let dev = eval("type_" + service + "(device)");
+          if (!dev) return;
+          if (!tpms.def.allowNew && !tpms.def.list[dev.id]) return;
+          if (!tpms.def.list[dev.id]) {
+            tpms.def.list[dev.id]={"hiP":50,"lowP":10};
+            let got=require("Storage").readJSON("tpms.json",1);
+            got.def=tpms.def;
+            require("Storage").writeJSON("tpms.json",got);
+            got=0;
+          }
+          tpms.def.ref=0;
+          device=[ ];
+          tpms.new++;
+          if (dev.psi<tpms.def.list[dev.id].lowP) {
+            alrm=1;
+            if (euc.state=="READY") euc.dash.alrt.warn.txt="LOW PRESSURE";
+            handleInfoEvent({"src":"TPMS","title":id,"body":"LOW PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
+          } else if (tpms.def.list[dev.id].hiP <=dev.psi) {
+            alrm=2;
+            if (euc.state=="READY") euc.dash.alrt.warn.txt="HI PRESSURE";
+            handleInfoEvent({"src":"TPMS","title":dev.id,"body":"HI PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
+          } else alrm=0;
+          if (euc.state!="OFF") tpms.euc[dev.id]={"time":time,"alrm":alrm,"psi":dev.psi};
+          let log=(require("Storage").readJSON("tpmsLog"+dev.id+".json",1))?require("Storage").readJSON("tpmsLog"+dev.id+".json",1):[];
+          log.unshift(dev);
+          if (10<log.length) log.pop();
+          require("Storage").writeJSON("tpmsLog"+dev.id+".json",log);
+          log=0;
+          tpms.def.id=dev.id;
+          dev=0;
+        });
+      });
       devices=[ ];
       if (!tpms.new) {
         if (tpms.try) {
@@ -180,7 +139,6 @@ tpms= {
           tpms.scan();
         },intT[tpms.def.int]*60000);
       }
-    //}, tpms.def.wait*1000);
     }, {timeout : tpms.def.wait*1000 });
   }
 };
