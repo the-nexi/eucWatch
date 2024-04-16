@@ -37,6 +37,7 @@ face[0] = {
 		this.spdF = euc.dash.opt.unit.fact.spd * ((ew.def.dash.mph) ? 0.625 : 1);
 		this.trpF = euc.dash.opt.unit.fact.dist * ((ew.def.dash.mph) ? 0.625 : 1);
 		this.run = true;
+		this.afterScrOff=false;
 	},
 	show: function(o) {
 		if (!this.run) return;
@@ -54,11 +55,13 @@ face[0] = {
 			if (ew.def.dash.batS) { if (this.bat != euc.dash.live.bat) this.batf(); }
 			else if (this.volt != euc.dash.live.volt.toFixed(1)) this.vltf();
 			else if (euc.dash.opt.tpms && tpms.euc[euc.dash.opt.tpms] && (this.tpms != tpms.euc[euc.dash.opt.tpms].alrm)) this.tpmsf();
+			this.afterScrOff=false;
 		}
 		else if (euc.state == "OFF") {
 			setTimeout(function() {
 				face.go("dashOff", 0);
 			}, 150);
+			this.afterScrOff=false;
 			return;
 			//rest
 		}
@@ -90,6 +93,7 @@ face[0] = {
 			t.show();
 			if (ew.dbg) print("simple dash, time in loop",getTime()-tm);
 		}, 100, this);
+		this.afterScrOff=false;
 	},
 	tmpf: function() {
 		this.tmp = euc.dash.live.tmp.toFixed(1);
@@ -155,7 +159,7 @@ face[0] = {
 	},
 	spdf: function() {
 		//this.spd=Math.round(euc.dash.live.spd);
-		if (Math.abs(euc.dash.live.spd - this.spd) < 2) this.spd = Math.round(euc.dash.live.spd);
+		if (Math.abs(euc.dash.live.spd - this.spd) < 2 || this.afterScrOff) this.spd = Math.round(euc.dash.live.spd);
 		else if (euc.dash.live.spd < this.spd) this.spd = Math.round(this.spd - (this.spd - euc.dash.live.spd) / 2);
 		else this.spd = Math.round(this.spd + (euc.dash.live.spd - this.spd) / 2);
 		this.g.setColor(0, (euc.dash.alrt.spd.cc == 1) ? 0 : this.spdC[euc.dash.alrt.spd.cc]);
@@ -199,6 +203,7 @@ face[0] = {
 	off: function() {
 		this.g.off();
 		this.clear();
+		this.afterScrOff=true;
 	}
 };
 //loop face
