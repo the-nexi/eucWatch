@@ -27,7 +27,7 @@ face[0] = {
     this.spdF=euc.dash.opt.unit.fact.spd*((ew.def.dash.mph)?0.625:1);
     this.trpF=euc.dash.opt.unit.fact.dist*((ew.def.dash.mph)?0.625:1);
     this.run=true;
-    this.afterScrOff=false;
+    if (typeof this.afterScrOff == "undefined") this.afterScrOff=false;
   },
   show : function(o){
     if (!this.run) return;
@@ -188,7 +188,7 @@ face[0] = {
   off: function(){
     this.g.off();
     this.clear();
-	this.afterScrOff=true;
+	  this.afterScrOff=true;
   }
 };
 //loop face
