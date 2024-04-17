@@ -33,7 +33,7 @@ face[0] = {
 		this.fact=euc.dash.opt.unit.fact.spd*((ew.def.dash.mph)?0.625:1);
 		this.trpF=euc.dash.opt.unit.fact.dist*((ew.def.dash.mph)?0.625:1);
 		this.run=true;
-		this.afterScrOff=false;
+		if (typeof this.afterScrOff == "undefined") this.afterScrOff=false;
 	},
 	show : function(o){
 		if (!this.run) return;
