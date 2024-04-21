@@ -6,106 +6,61 @@ euc.cmd = function(no, val) {
 	//"ram";
 	switch (no) {
 		//euc.wri("getParamA");
-		case "manual":
-			return val;
-		case "getModel":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 20, 90, 90];
-		case "getSerial":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 20, 90, 90];
-		case "getAlarms":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 20, 90, 90];
-		case "doHorn":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 20, 90, 90];
-		case "doBeep":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 20, 90, 90];
-		case "setLiftOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 20, 90, 90];
+		case "manual": return val;
+		case "getModel": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 20, 90, 90]);
+		case "getSerial": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 20, 90, 90]);
+		case "getAlarms": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 20, 90, 90]);
+		case "doHorn": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 20, 90, 90]);
+		case "doBeep": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 20, 90, 90]);
+		case "setLiftOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 20, 90, 90]);
 			//power
-		case "getPowerOff":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90];
-		case "setPowerOff":
-			return [170, 85, 1, 0, (val & 255), ((val >> 8) & 255), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90];
-		case "doPowerOff":
-			return [170, 85, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 20, 90, 90];
+		case "getPowerOff": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90]);
+		case "setPowerOff": return E.toUint8Array([170, 85, 1, 0, (val & 255), ((val >> 8) & 255), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90]);
+		case "doPowerOff": return E.toUint8Array([170, 85, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 20, 90, 90]);
 			//leds
 		case "setLights":
 			if (!val) val = euc.is.night ? 3 : 2;
-			return [170, 85, 17 + val, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90];
-		case "getStrobe":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 20, 90, 90];
-		case "setStrobeOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 20, 90, 90];
-		case "getLedMagic":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 20, 90, 90];
-		case "setLedMagicOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 20, 90, 90];
-		case "getLedRide":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 109, 20, 90, 90];
-		case "setLedRideOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 20, 90, 90];
-		case "getSpectrum":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 20, 90, 90]; // to b checked
-		case "setSpectrumOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 20, 90, 90];
-		case "getSpectrumMode":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 20, 90, 90];
-		case "setSpectrumMode":
-			return [170, 85, val ? val : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 151, 20, 90, 90];
+			return E.toUint8Array([170, 85, 17 + val, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90]);
+		case "getStrobe": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 20, 90, 90]);
+		case "setStrobeOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 20, 90, 90]);
+		case "getLedMagic": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 20, 90, 90]);
+		case "setLedMagicOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 20, 90, 90]);
+		case "getLedRide": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 109, 20, 90, 90]);
+		case "setLedRideOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 20, 90, 90]);
+		case "getSpectrum": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 20, 90, 90]); // to b checked
+		case "setSpectrumOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 20, 90, 90]);
+		case "getSpectrumMode": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 20, 90, 90]);
+		case "setSpectrumMode": return E.toUint8Array([170, 85, val ? val : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 151, 20, 90, 90]);
 			//BT music mode
-		case "getBTMusic":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 20, 90, 90];
-		case "setBTMusicOnOff":
-			return [170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 20, 90, 90];
+		case "getBTMusic": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 20, 90, 90]);
+		case "setBTMusicOnOff": return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 20, 90, 90]);
 			//voice
-		case "getVoice":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 20, 90, 90];
-		case "setVoiceOnOff":
-			return [170, 85, val ? val : 0, val ? 0 : 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90];
-		case "setVoiceVolUp":
-			return [170, 85, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90];
-		case "setVoiceVolDn":
-			return [170, 85, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90];
+		case "getVoice": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 20, 90, 90]);
+		case "setVoiceOnOff": return E.toUint8Array([170, 85, val ? val : 0, val ? 0 : 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90]);
+		case "setVoiceVolUp": return E.toUint8Array([170, 85, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90]);
+		case "setVoiceVolDn": return E.toUint8Array([170, 85, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90]);
 			//gyro
-		case "doCalibrate":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 137, 20, 90, 90];
-		case "getCalibrateTilt":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90];
-		case "setCalibrateTilt":
-			return [170, 85, 1, 0, val & 255, (val >> 8) & 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90];
+		case "doCalibrate": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 137, 20, 90, 90]);
+		case "getCalibrateTilt": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90]);
+		case "setCalibrateTilt": return E.toUint8Array([170, 85, 1, 0, val & 255, (val >> 8) & 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90]);
 			//ride mode 0=hard,1=med,2=soft
-		case "setRideMode":
-			return [170, 85, val ? val : 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 20, 90, 90];
-		case "getRideParamA":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 146, 20, 90, 90];
-		case "getRideParamB":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 147, 20, 90, 90];
-		case "getRideParamC":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 20, 90, 90];
+		case "setRideMode": return E.toUint8Array([170, 85, val ? val : 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 20, 90, 90]);
+		case "getRideParamA": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 146, 20, 90, 90]);
+		case "getRideParamB": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 147, 20, 90, 90]);
+		case "getRideParamC": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 20, 90, 90]);
 			//lock
-		case "doUnlock":
-			return val;
-		case "doLockOnce":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 20, 90, 90];
-		case "getLockOnce":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 20, 90, 90];
-		case "doLock":
-			return [170, 85, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 93, 20, 90, 90];
-		case "getLock":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 20, 90, 90];
-		case "getPass":
-			return [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 20, 90, 90];
-		case "setPass":
-			return [170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 20, 90, 90];
-		case "setPassClear":
-			return [170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 20, 90, 90];
-		case "setPassSend":
-			return [170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 20, 90, 90];
-		case "setPassChange":
-			return [170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 48 + Number(euc.dash.opt.lock.passOld[0]), 48 + Number(euc.dash.opt.lock.passOld[1]), 48 + Number(euc.dash.opt.lock.passOld[2]), 48 + Number(euc.dash.opt.lock.passOld[3]), 0, 0, 0, 0, 0, 0, 65, 20, 90, 90]; //rf 43
-		case "setSpeedLimits":
-			return [170, 85, euc.dash.alrt.spd.one.en ? euc.dash.alrt.spd.one.val : 0, 0, euc.dash.alrt.spd.two.en ? euc.dash.alrt.spd.two.val : 0, 0, euc.dash.alrt.spd.thre.val, 0, euc.dash.alrt.spd.tilt.val, 0, 49, 50, 51, 52, 53, 54, 133, 20, 90, 90];
-		default:
-			return [];
+		case "doUnlock": return val;
+		case "doLockOnce": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 20, 90, 90]);
+		case "getLockOnce": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 20, 90, 90]);
+		case "doLock": return E.toUint8Array([170, 85, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 93, 20, 90, 90]);
+		case "getLock": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 20, 90, 90]);
+		case "getPass": return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 20, 90, 90]);
+		case "setPass": return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 20, 90, 90]);
+		case "setPassClear": return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 20, 90, 90]);
+		case "setPassSend": return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 20, 90, 90]);
+		case "setPassChange": return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 48 + Number(euc.dash.opt.lock.passOld[0]), 48 + Number(euc.dash.opt.lock.passOld[1]), 48 + Number(euc.dash.opt.lock.passOld[2]), 48 + Number(euc.dash.opt.lock.passOld[3]), 0, 0, 0, 0, 0, 0, 65, 20, 90, 90]); //rf 43
+		case "setSpeedLimits": return E.toUint8Array([170, 85, euc.dash.alrt.spd.one.en ? euc.dash.alrt.spd.one.val : 0, 0, euc.dash.alrt.spd.two.en ? euc.dash.alrt.spd.two.val : 0, 0, euc.dash.alrt.spd.thre.val, 0, euc.dash.alrt.spd.tilt.val, 0, 49, 50, 51, 52, 53, 54, 133, 20, 90, 90]);
+		default: return E.toUint8Array([]);
 	}
 };
 euc.temp.city = function() {
@@ -388,7 +343,7 @@ euc.temp.resp = function(inpk) {
 			let i5 = (i2 + i4 + i3 + i1) % 10;
 			let i6 = i4 + i5;
 			let i7 = (i3 + i6 + i1) % 10;
-			euc.temp.lockKey = [170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 48 + i5, 48 + r1, 48 + i7, 48 + r2, 48 + (i6 + i7 + i1) % 10, 48 + r3, 93, 20, 90, 90];
+			euc.temp.lockKey = E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 48 + i5, 48 + r1, 48 + i7, 48 + r2, 48 + (i6 + i7 + i1) % 10, 48 + r3, 93, 20, 90, 90]);
 		}
 		else
 			euc.temp.lockKey = 0;

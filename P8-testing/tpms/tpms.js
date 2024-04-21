@@ -106,7 +106,7 @@ tpms= {
             if (euc.state=="READY") euc.dash.alrt.warn.txt="HI PRESSURE";
             handleInfoEvent({"src":"TPMS","title":dev.id,"body":"HI PRESSURE."+"  "+dev[tpms.def.metric]+" "+tpms.def.metric+"  "},1);
           } else alrm=0;
-          if (euc.state!="OFF") tpms.euc[dev.id]={"time":time,"alrm":alrm,"psi":dev.psi};
+          if (euc.state!="OFF") tpms.euc[dev.id]={"time":dev.time,"alrm":dev.alrm,"psi":dev.psi};
           let log=(require("Storage").readJSON("tpmsLog"+dev.id+".json",1))?require("Storage").readJSON("tpmsLog"+dev.id+".json",1):[];
           log.unshift(dev);
           if (10<log.length) log.pop();
