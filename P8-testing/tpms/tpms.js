@@ -34,6 +34,7 @@ tpms= {
   type_fbb0:(device)=>{
     let mac=device.id.split(" ")[0].split(":");
     if (mac[1]+mac[2] != "eaca") return;
+    if (typeof device.manufacturerData == 'undefined' || device.manufacturerData.length < 16) return;
     let id=mac[3]+mac[4]+mac[5];
     let time=getTime()|0;
     let alrm=0;
@@ -83,6 +84,7 @@ tpms= {
         let parseFunc = new Function("device", "return tpms.type_" + service + "(device)");
         devicesFilter = NRF.filterDevices(devices, [{services:[ service ]}] );
         devicesFilter.forEach(function(device) {
+          if (ew.is.bt===2 && tpms.dbg == 1) console.log(device);
           if (device == [ ] || !device.id ) return;
           let dev = parseFunc(device);
           if (!dev) return;
