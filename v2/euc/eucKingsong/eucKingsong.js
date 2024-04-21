@@ -195,7 +195,7 @@ euc.temp.one = function(inpk) {
 	if (euc.dash.alrt.tmp.hapt.en && euc.dash.alrt.tmp.cc == 2) euc.is.alert++;
 	//total mileage
 	//euc.dash.trip.totl = ((inpk[6] << 16) + (inpk[7] << 24) + inpk[8] + (inpk[9] << 8)) / 1000;
-	euc.dash.trip.totl = lala.getInt32(6,true) / 1000;
+	euc.dash.trip.totl = ((lala.getUint16(6,true) << 16) | lala.getUint16(8,true)) / 1000;
 	euc.log.trip.forEach(function(val, pos) { if (!val) euc.log.trip[pos] = euc.dash.trip.totl; });
 	//mode
 	euc.dash.opt.ride.mode = inpk[14];
@@ -207,16 +207,21 @@ euc.temp.one = function(inpk) {
 };
 euc.temp.two = function(inpk) {
 	// "ram";
-	euc.dash.trip.last = ((inpk[2] << 16) + (inpk[3] << 24) + inpk[4] + (inpk[5] << 8)) / 1000;
-	euc.dash.trip.time = Math.round((inpk[7] << 8 | inpk[6]) / 60);
-	euc.dash.trip.topS = Math.round((inpk[9] << 8 | inpk[8]) / 100); ///////
+	let lala = new DataView(inpk);
+	//euc.dash.trip.last = ((inpk[2] << 16) + (inpk[3] << 24) + inpk[4] + (inpk[5] << 8)) / 1000;
+	euc.dash.trip.last = ((lala.getUint16(2,true) << 16) | lala.getUint16(4,true)) / 1000;
+	//euc.dash.trip.time = Math.round((inpk[7] << 8 | inpk[6]) / 60);
+	euc.dash.trip.time = Math.round(lala.getUint16(6,true) / 60);
+	//euc.dash.trip.topS = Math.round((inpk[9] << 8 | inpk[8]) / 100); ///////
+	euc.dash.trip.topS = Math.round(lala.getUint16(8,true) / 100);
 	//euc.dash.opt.lght.HL=inpk[10]-17;
 	euc.dash.opt.lght.HL = inpk[10] - 17;
 	euc.dash.info.on = inpk[11]; //onOffState
 	euc.dash.opt.snsr.fan = inpk[12];
 	euc.dash.opt.snsr.chrg = inpk[13];
 	euc.charge = euc.dash.opt.snsr.chrg ? 1 : 0;
-	euc.dash.live.tmpM = Math.round((inpk[15] << 8 | inpk[14]) / 100);
+	//euc.dash.live.tmpM = Math.round((inpk[15] << 8 | inpk[14]) / 100);
+	euc.dash.live.tmpM = Math.round(lala.getInt16(14,true) / 100);
 };
 euc.temp.thre = function(inpk) {
 	// "ram";
