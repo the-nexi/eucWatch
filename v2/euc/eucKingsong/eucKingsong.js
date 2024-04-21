@@ -3,7 +3,6 @@ E.setFlags({ pretokenise: 1 });
 euc.buff=[];
 euc.wri = function(i) { if (euc.dbg) console.log("not connected yet"); if (i == "end") euc.off(); return; };
 euc.cmd = function(no, val) {
-	//"ram";
 	switch (no) {
 		//euc.wri("getParamA");
 		case "manual": return val;
@@ -160,9 +159,9 @@ euc.temp.inpk = function(event) {
 };
 //
 euc.temp.one = function(inpk) {
-	//speed
 	//"ram";
 	let lala = new DataView(inpk);
+	//speed
 	//euc.dash.live.spd = (inpk[5] << 8 | inpk[4]) / 100;
 	euc.dash.live.spd = lala.getInt16(4, true) / 100;
 	euc.dash.alrt.spd.cc = (euc.dash.alrt.spd.hapt.hi <= euc.dash.live.spd) ? 2 : (euc.dash.alrt.spd.hapt.low <= euc.dash.live.spd) ? 1 : 0;
@@ -200,9 +199,7 @@ euc.temp.one = function(inpk) {
 	//mode
 	euc.dash.opt.ride.mode = inpk[14];
 	//City lights
-	if (euc.dash.opt.lght.city && euc.dash.live.spd) {
-		euc.temp.city();
-	}
+	if (euc.dash.opt.lght.city && euc.dash.live.spd) euc.temp.city();
 	euc.emit("refresh");
 };
 euc.temp.two = function(inpk) {
@@ -225,9 +222,13 @@ euc.temp.two = function(inpk) {
 };
 euc.temp.thre = function(inpk) {
 	// "ram";
-	euc.dash.alrt.spd.max = (inpk[3] << 8 | inpk[2]) / 100;
-	euc.dash.info.tRdT = (inpk[13] << 8 | inpk[12]);
-	euc.dash.alrt.warn.code = (inpk[15] << 8 | inpk[14]);
+	let lala = new DataView(inpk);
+	//euc.dash.alrt.spd.max = (inpk[3] << 8 | inpk[2]) / 100;
+	euc.dash.alrt.spd.max = lala.getUint16(2,true) / 100;
+	//euc.dash.info.tRdT = (inpk[13] << 8 | inpk[12]);
+	euc.dash.info.tRdT = lala.getUint16(12,true);
+	//euc.dash.alrt.warn.code = (inpk[15] << 8 | inpk[14]);
+	euc.dash.alrt.warn.code = lala.getUint16(14,true);
 	if (euc.dash.alrt.warn.code) euc.dash.alrt.warn.txt = euc.temp.faultAlarms(euc.dash.alrt.warn.code);
 	euc.dash.alrt.pwr = (euc.dash.alrt.spd.max < euc.dash.alrt.spd.tilt.val && euc.dash.alrt.spd.max - 5 < euc.dash.live.spd) ? 1 : 0;
 	euc.log.almL.unshift(euc.dash.alrt.pwr);
@@ -238,143 +239,148 @@ euc.temp.thre = function(inpk) {
 //
 euc.temp.rspF = {};
 
-euc.temp.rspF.one = function(inpk) {
-
-
-};
+euc.temp.rspF.one = function(inpk) {};
 
 euc.temp.resp = function(inpk) {
-	// "ram";
 	if (2 < euc.dbg) print("id, responce:",inpk[16], inpk);
-	if (inpk[16] == 63)
-		euc.dash.auto.offT = inpk[5] << 8 | inpk[4];
-	else if (inpk[16] == 67) {
-		if (2 < euc.dbg) print("bt pass:", inpk);
-		if (inpk[6] == 1) {
-			if (inpk[2] == 255) euc.dash.opt.lock.pass = "";
-			else euc.dash.opt.lock.pass = "" + (inpk[2] - 48) + (inpk[3] - 48) + (inpk[4] - 48) + (inpk[5] - 48);
-		}
-	}
-	else if (inpk[16] == 70) {
-		if (2 < euc.dbg) print("bt pass state:", inpk);
-		euc.temp.pass = inpk[2];
-	}
-	else if (inpk[16] == 72)
-		euc.dash.info.oldM = inpk[2];
-	else if (inpk[16] == 74)
-		euc.dash.opt.lght.sprm = inpk[2]; //spectrum
-	else if (inpk[16] == 76)
-		euc.dash.opt.snsr.lift = inpk[2];
-	else if (inpk[16] == 77)
-		euc.dash.opt.lght.sprM = inpk[2]; //spectrum Mode
-	else if (inpk[16] == 82)
-		euc.dash.info.mdId = inpk[2]; //modeId
-	else if (inpk[16] == 85)
-		euc.dash.opt.lght.strb = inpk[2];
-	else if (inpk[16] == 88)
-		euc.dash.opt.snd.BTMc = inpk[2]; //BTMusic
-	else if (inpk[16] == 107)
-		euc.dash.opt.lang = inpk[2];
-	else if (inpk[16] == 110)
-		euc.dash.opt.lght.led = 1 - inpk[2];
-	else if (inpk[16] == 138 && inpk[2] == 0) {
-		//if ( inpk[2] == 0 )  {
-		euc.dash.opt.ride.pTlt = ((inpk[5] & 0xff) << 8) | (inpk[4] & 0xff); //pedal tilt
-		if (32767 < euc.dash.opt.ride.pTlt) euc.dash.opt.ride.pTlt = euc.dash.opt.ride.pTlt - 65536;
-		//}
-	}
-	else if (inpk[16] == 162)
-		euc.dash.opt.ride.mode = inpk[4];
-	else if (inpk[16] == 172 || inpk[16] == 173 || inpk[16] == 174){ //Prapam
-		if (2 < euc.dbg) print("in ", inpk[16]);
-	}else if (inpk[16] == 179) {
-		let wc = { "W": "WHITE", "B": "BLACK", "S": "SILVER GRAY", "Y": "YELLOW", "R": "RED", "D": "RUBBER BLACK", "C": "CUSTOM" };
-		let model = {
-			"14D": [1, 340, 420, 680, 840],
-			"16D": [1, 340, 420, 680, 840, 520],
-			"16S": [1, 680, 840, 0, 420],
-			"16X": [1.25, 777, 1554],
-			"18A": [1, 0, 0, 0, 520, 680, 1360, 840, 1680],
-			"18S": [1, 0, 0, 680, 1360, 840, 1680],
-			"18L": [1.25, 0, 1036, 0, 1554],
-			"S18": [1.25, 1110],
-			"S20": [1.875, 2220],
-			"S22": [1.875, 2220],
-			"SA0": [1.875, 2220],
-			"SA1": [1.875, 2220],
-			"SA2": [1.875, 2220]
-		};
-		//global.lala = inpk;
-		euc.dash.info.get.serl = E.toString(inpk.slice(2, 16), inpk.slice(17, 20));
-		euc.dash.info.get.manD = E.toString(inpk[11], inpk[12], "-", inpk[13], inpk[14], "-20", inpk[9], inpk[10]);
-		euc.dash.info.get.colr = wc[E.toString(inpk[8])];
-		euc.dash.info.get.modl = E.toString(inpk.slice(4, 7));
-		euc.dash.opt.bat.mAh = model[euc.dash.info.get.modl][inpk[7] - 48];
-		euc.dash.opt.bat.pack = model[euc.dash.info.get.modl][0];
-		wc = 0;
-		model = 0;
-
-	}
-	else if (inpk[16] == 181) {
-		if (inpk[4] == 0 || inpk[4] == 255)
-			euc.dash.alrt.spd.one.en = 0;
-		else {
-			euc.dash.alrt.spd.one.val = inpk[4];
-			euc.dash.alrt.spd.one.en = 1;
-		}
-		if (inpk[6] == 0)
-			euc.dash.alrt.spd.two.en = 0;
-		else {
-			euc.dash.alrt.spd.two.val = inpk[6];
-			euc.dash.alrt.spd.two.en = 1;
-		}
-		euc.dash.alrt.spd.thre.val = inpk[8];
-		euc.dash.alrt.spd.tilt.val = inpk[10];
-		euc.dash.alrt.spd.tilt.val = inpk[10];
-	}
-	else if (inpk[16] == 187) {
-		if (!euc.dash.info.get.name) {
+	switch (inpk[16]) {
+		case 0x3F:
+			euc.dash.auto.offT = inpk[5] << 8 | inpk[4];
+			break;
+		case 0x43:
+			if (2 < euc.dbg) print("bt pass:", inpk);
+			if (inpk[6] == 1) {
+				if (inpk[2] == 255) euc.dash.opt.lock.pass = "";
+				else euc.dash.opt.lock.pass = "" + (inpk[2] - 48) + (inpk[3] - 48) + (inpk[4] - 48) + (inpk[5] - 48);
+			}
+			break;
+		case 0x46:
+			if (2 < euc.dbg) print("bt pass state:", inpk);
+			euc.temp.pass = inpk[2];
+			break;
+		case 0x48:
+			euc.dash.info.oldM = inpk[2];
+			break;
+		case 0x4A:
+			euc.dash.opt.lght.sprm = inpk[2]; //spectrum
+			break;
+		case 0x4C:
+			euc.dash.opt.snsr.lift = inpk[2];
+			break;
+		case 0x4D:
+			euc.dash.opt.lght.sprM = inpk[2]; //spectrum Mode
+			break;
+		case 0x52:
+			euc.dash.info.mdId = inpk[2]; //modeId
+			break;
+		case 0x55:
+			euc.dash.opt.lght.strb = inpk[2];
+			break;
+		case 0x58:
+			euc.dash.opt.snd.BTMc = inpk[2]; //BTMusic
+			break;
+		case 0x6B:
+			euc.dash.opt.lang = inpk[2];
+			break;
+		case 0x6E:
+			euc.dash.opt.lght.led = 1 - inpk[2];
+			break;
+		case 0x8A:
+			if (inpk[2] != 0) break;
+			euc.dash.opt.ride.pTlt = ((inpk[5]<< 8) | inpk[4]); //pedal tilt
+			if (32767 < euc.dash.opt.ride.pTlt) euc.dash.opt.ride.pTlt = euc.dash.opt.ride.pTlt - 65536;
+			break;
+		case 0xA2:
+			euc.dash.opt.ride.mode = inpk[4];
+			break;
+		case 0xAC:
+		case 0xAD:
+		case 0xAE: //Prapam
+		case 0xE7: //speedPswd
+			if (2 < euc.dbg) print("in ", inpk[16]);
+			break;
+		case 0xB3:
+			let wc = { "W": "WHITE", "B": "BLACK", "S": "SILVER GRAY", "Y": "YELLOW", "R": "RED", "D": "RUBBER BLACK", "C": "CUSTOM" };
+			let model = {
+				"14D": [1, 340, 420, 680, 840],
+				"16D": [1, 340, 420, 680, 840, 520],
+				"16S": [1, 680, 840, 0, 420],
+				"16X": [1.25, 777, 1554],
+				"18A": [1, 0, 0, 0, 520, 680, 1360, 840, 1680],
+				"18S": [1, 0, 0, 680, 1360, 840, 1680],
+				"18L": [1.25, 0, 1036, 0, 1554],
+				"S18": [1.25, 1110],
+				"S20": [1.875, 2220],
+				"S22": [1.875, 2220],
+				"SA0": [1.875, 2220],
+				"SA1": [1.875, 2220],
+				"SA2": [1.875, 2220]
+			};
+			//global.lala = inpk;
+			euc.dash.info.get.serl = E.toString(inpk.slice(2, 16), inpk.slice(17, 20));
+			euc.dash.info.get.manD = E.toString(inpk[11], inpk[12], "-", inpk[13], inpk[14], "-20", inpk[9], inpk[10]);
+			euc.dash.info.get.colr = wc[E.toString(inpk[8])];
+			euc.dash.info.get.modl = E.toString(inpk.slice(4, 7));
+			euc.dash.opt.bat.mAh = model[euc.dash.info.get.modl][inpk[7] - 48];
+			euc.dash.opt.bat.pack = model[euc.dash.info.get.modl][0];
+			wc = 0;
+			model = 0;
+			break;
+		case 0xB5:
+			if (inpk[4] == 0 || inpk[4] == 255)
+				euc.dash.alrt.spd.one.en = 0;
+			else {
+				euc.dash.alrt.spd.one.val = inpk[4];
+				euc.dash.alrt.spd.one.en = 1;
+			}
+			if (inpk[6] == 0)
+				euc.dash.alrt.spd.two.en = 0;
+			else {
+				euc.dash.alrt.spd.two.val = inpk[6];
+				euc.dash.alrt.spd.two.en = 1;
+			}
+			euc.dash.alrt.spd.thre.val = inpk[8];
+			euc.dash.alrt.spd.tilt.val = inpk[10];
+			euc.dash.alrt.spd.tilt.val = inpk[10];
+			break;
+		case 0xBB:
+			if (euc.dash.info.get.name) break;
 			euc.dash.info.get.id = E.toString(inpk.slice(2, inpk.indexOf(0)));
 			if (euc.dash.info.get.id.split("-")) {
 				euc.dash.info.get.firm = euc.dash.info.get.id.split("-")[2];
 				euc.dash.info.get.name = euc.dash.info.get.id.split("-")[1];
 				ew.do.fileWrite("dash", "slot" + require("Storage").readJSON("dash.json", 1).slot + "Model", euc.dash.info.get.name);
 			}
-		}
+			break;
+		case 0xC9:
+			euc.lala = inpk;
+			break;
+		case 0x5F:
+			if (inpk[2] == 1) {
+				let r1 = (Math.random() * 10) | 0;
+				let r2 = (Math.random() * 10) | 0;
+				let r3 = (Math.random() * 10) | 0;
+				let i1 = inpk[8] == 0 ? 5 : inpk[8] - 48;
+				let i2 = inpk[4] == 0 ? 1 : inpk[4] - 48;
+				let i3 = inpk[6] == 0 ? 4 : inpk[6] - 48;
+				let i4 = r1 + r2 + r3;
+				let i5 = (i2 + i4 + i3 + i1) % 10;
+				let i6 = i4 + i5;
+				let i7 = (i3 + i6 + i1) % 10;
+				euc.temp.lockKey = E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 48 + i5, 48 + r1, 48 + i7, 48 + r2, 48 + (i6 + i7 + i1) % 10, 48 + r3, 93, 20, 90, 90]);
+			}
+			else
+				euc.temp.lockKey = 0;
+			if (1 < euc.dbg) console.log("EUC module: got lock status, lock key:", inpk[2], euc.temp.lockKey);
+			euc.dash.opt.lock.en = inpk[2];
+			break;
 	}
-	else if (inpk[16] == 201)
-		euc.lala = inpk;
-	else if (inpk[16] == 231){ //speedPswd
-		if (2 < euc.dbg) print("in 231");
-	}else if (inpk[16] == 95) {
-		if (inpk[2] == 1) {
-			let r1 = (Math.random() * 10) | 0;
-			let r2 = (Math.random() * 10) | 0;
-			let r3 = (Math.random() * 10) | 0;
-			let i1 = inpk[8] == 0 ? 5 : inpk[8] - 48;
-			let i2 = inpk[4] == 0 ? 1 : inpk[4] - 48;
-			let i3 = inpk[6] == 0 ? 4 : inpk[6] - 48;
-			let i4 = r1 + r2 + r3;
-			let i5 = (i2 + i4 + i3 + i1) % 10;
-			let i6 = i4 + i5;
-			let i7 = (i3 + i6 + i1) % 10;
-			euc.temp.lockKey = E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 48 + i5, 48 + r1, 48 + i7, 48 + r2, 48 + (i6 + i7 + i1) % 10, 48 + r3, 93, 20, 90, 90]);
-		}
-		else
-			euc.temp.lockKey = 0;
-		if (1 < euc.dbg) console.log("EUC module: got lock status, lock key:", inpk[2], euc.temp.lockKey);
-		euc.dash.opt.lock.en = inpk[2];
-
-	}
-	if (ew.dbg&&ew.log) { 
-		ew.log.unshift("Proxy from wheel: "+" "+Date()+" "+E.toJS(inpk));
-		if (100<ew.log.length) ew.log.pop();
-	}
+	if (!ew.dbg || !ew.log) return;
+	ew.log.unshift("Proxy from wheel: "+" "+Date()+" "+E.toJS(inpk));
+	if (100<ew.log.length) ew.log.pop();
 };
 
-
 euc.temp.faultAlarms = function(code) {
-	// "ram";
 	//if (code==218) 
 	//	euc.log.evnt={"spd":euc.dash.live.spd,"pwm":euc.dash.live.pwm};
 	switch (code) {
