@@ -100,7 +100,8 @@ euc.temp.city = function() {
 };
 euc.temp.inpk = function(event) {
 	// "ram";
-	let inpk = JSON.parse(E.toJS(event.target.value.buffer));
+	//let inpk = JSON.parse(E.toJS(event.target.value.buffer));
+	let inpk = event.target.value.buffer;
 	if (ew.is.bt == 5) {
 		NRF.updateServices({ 0xffe0: { 0xffe1: { value: inpk, notify: true } } });
 		//if (ew.dbg&&ew.log) {
@@ -111,30 +112,33 @@ euc.temp.inpk = function(event) {
 	if (inpk[0] == 188) return;
 	euc.is.alert = 0;
 	if (8 < euc.dbg) console.log("INPUT :", inpk);
-	if (inpk[16] == 169) {
-		if (euc.dbg == 4) console.log("INPUT :", inpk);
-		euc.temp.one(inpk);
+	switch (inpk[16]) {
+		case 0xA9:
+			if (euc.dbg == 4) console.log("INPUT :", inpk);
+			euc.temp.one(inpk);
+			break;
+		case 0xB9: // trip-time-max_speed
+			if (euc.dbg == 5) console.log("INPUT :", inpk);
+			euc.temp.two(inpk);
+			break;
+		case 0xF5:
+			if (euc.dbg == 6) console.log("INPUT :", inpk);
+			euc.dash.info.mtrL = inpk[6]; //motorLine
+			euc.dash.info.gyro = inpk[7];
+			euc.dash.info.mtrH = inpk[8]; //motorHolzer
+			euc.dash.info.cpuR = inpk[14]; //cpuRate
+			//euc.dash.info.outR=inpk[15]; //outputRate
+			euc.dash.live.pwm = inpk[15];
+			if (euc.dash.trip.pwm < euc.dash.live.pwm) euc.dash.trip.pwm = euc.dash.live.pwm;
+			break;
+		case 0xF6:
+			if (euc.dbg == 7) console.log("INPUT :", inpk);
+			euc.temp.thre(inpk);
+			break;
+		default:
+			euc.temp.resp(inpk);
+			break;
 	}
-	else if (inpk[16] == 185) { //trip-time-max_speed
-		if (euc.dbg == 5) console.log("INPUT :", inpk);
-		euc.temp.two(inpk);
-	}
-	else if (inpk[16] == 245) {
-		if (euc.dbg == 6) console.log("INPUT :", inpk);
-		euc.dash.info.mtrL = inpk[6]; //motorLine
-		euc.dash.info.gyro = inpk[7];
-		euc.dash.info.mtrH = inpk[8]; //motorHolzer
-		euc.dash.info.cpuR = inpk[14]; //cpuRate
-		//euc.dash.info.outR=inpk[15]; //outputRate
-		euc.dash.live.pwm = inpk[15];
-		if (euc.dash.trip.pwm < euc.dash.live.pwm) euc.dash.trip.pwm = euc.dash.live.pwm;
-	}
-	else if (inpk[16] == 246) {
-		if (euc.dbg == 7) console.log("INPUT :", inpk);
-		euc.temp.thre(inpk);
-	}
-	else
-		euc.temp.resp(inpk);
 	//haptic
 	if (euc.dash.alrt.pwm.hapt.en && (euc.dash.alrt.pwr || euc.dash.alrt.pwm.hapt.hi <= euc.dash.live.pwm)) {
 		buzzer.sys( 60);
@@ -158,12 +162,15 @@ euc.temp.inpk = function(event) {
 euc.temp.one = function(inpk) {
 	//speed
 	//"ram";
-	euc.dash.live.spd = (inpk[5] << 8 | inpk[4]) / 100;
+	let lala = new DataView(inpk);
+	//euc.dash.live.spd = (inpk[5] << 8 | inpk[4]) / 100;
+	euc.dash.live.spd = lala.getInt16(4, true) / 100;
 	euc.dash.alrt.spd.cc = (euc.dash.alrt.spd.hapt.hi <= euc.dash.live.spd) ? 2 : (euc.dash.alrt.spd.hapt.low <= euc.dash.live.spd) ? 1 : 0;
 	if (euc.dash.alrt.spd.hapt.en && euc.dash.alrt.spd.cc == 2)
 		euc.is.alert = 1 + Math.round((euc.dash.live.spd - euc.dash.alrt.spd.two.val) / euc.dash.alrt.spd.hapt.step);
 	//amp
-	this.amp = inpk[11] << 8 | inpk[10];
+	//this.amp = inpk[11] << 8 | inpk[10];
+	this.amp = lala.getInt16(10, true);
 	if (32767 < this.amp) this.amp = this.amp - 65536;
 	euc.dash.live.amp = (this.amp / 100);
 	euc.log.ampL.unshift(Math.round(euc.dash.live.amp));
@@ -174,18 +181,21 @@ euc.temp.one = function(inpk) {
 		else euc.is.alert = euc.is.alert + 1 + Math.round(-(euc.dash.live.amp - euc.dash.alrt.amp.hapt.low) / euc.dash.alrt.amp.hapt.step);
 	}
 	//volt
-	euc.dash.live.volt = (inpk[3] << 8 | inpk[2]) / 100;
+	//euc.dash.live.volt = (inpk[3] << 8 | inpk[2]) / 100;
+	euc.dash.live.volt = lala.getInt16(2, true) / 100;
 	euc.dash.live.bat = Math.round(100 * (euc.dash.live.volt * (100 / euc.dash.opt.bat.pack) - euc.dash.opt.bat.low) / (euc.dash.opt.bat.hi - euc.dash.opt.bat.low));
 	euc.log.batL.unshift(euc.dash.live.bat);
 	if (20 < euc.log.batL.length) euc.log.batL.pop();
 	euc.dash.alrt.bat.cc = (50 <= euc.dash.live.bat) ? 0 : (euc.dash.live.bat <= euc.dash.alrt.bat.hapt.low) ? 2 : 1;
 	if (euc.dash.alrt.bat.hapt.en && euc.dash.alrt.bat.cc == 2) euc.is.alert++;
 	//temp
-	euc.dash.live.tmp = (inpk[13] << 8 | inpk[12]) / 100;
+	//euc.dash.live.tmp = (inpk[13] << 8 | inpk[12]) / 100;
+	euc.dash.live.tmp = lala.getInt16(12, true) / 100;
 	euc.dash.alrt.tmp.cc = (euc.dash.alrt.tmp.hapt.hi - 5 <= euc.dash.live.tmp) ? (euc.dash.alrt.tmp.hapt.hi <= euc.dash.live.tmp) ? 2 : 1 : 0;
 	if (euc.dash.alrt.tmp.hapt.en && euc.dash.alrt.tmp.cc == 2) euc.is.alert++;
 	//total mileage
-	euc.dash.trip.totl = ((inpk[6] << 16) + (inpk[7] << 24) + inpk[8] + (inpk[9] << 8)) / 1000;
+	//euc.dash.trip.totl = ((inpk[6] << 16) + (inpk[7] << 24) + inpk[8] + (inpk[9] << 8)) / 1000;
+	euc.dash.trip.totl = lala.getInt32(6,true) / 1000;
 	euc.log.trip.forEach(function(val, pos) { if (!val) euc.log.trip[pos] = euc.dash.trip.totl; });
 	//mode
 	euc.dash.opt.ride.mode = inpk[14];
