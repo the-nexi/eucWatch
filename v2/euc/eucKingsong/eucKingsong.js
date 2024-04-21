@@ -2,7 +2,110 @@
 E.setFlags({ pretokenise: 1 });
 euc.buff=[];
 euc.wri = function(i) { if (euc.dbg) console.log("not connected yet"); if (i == "end") euc.off(); return; };
+euc.cmd.getModel = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 20, 90, 90]); }
+euc.cmd.getSerial = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 20, 90, 90]); }
+euc.cmd.getAlarms = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 20, 90, 90]); }
+euc.cmd.doHorn = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 20, 90, 90]); }
+euc.cmd.doBeep = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 20, 90, 90]); }
+euc.cmd.setLiftOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 20, 90, 90]); }
+	//power
+euc.cmd.getPowerOff = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90]); }
+euc.cmd.setPowerOff = function(val) { return E.toUint8Array([170, 85, 1, 0, (val & 255), ((val >> 8) & 255), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 20, 90, 90]); }
+euc.cmd.doPowerOff = function() { return E.toUint8Array([170, 85, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 20, 90, 90]); }
+	//leds
+euc.cmd.setLights = function(val) {
+	if (!val) val = euc.is.night ? 3 : 2;
+	return E.toUint8Array([170, 85, 17 + val, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90]);
+}
+euc.cmd.getStrobe = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 20, 90, 90]); }
+euc.cmd.setStrobeOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 20, 90, 90]); }
+euc.cmd.getLedMagic = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 20, 90, 90]); }
+euc.cmd.setLedMagicOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 20, 90, 90]); }
+euc.cmd.getLedRide = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 109, 20, 90, 90]); }
+euc.cmd.setLedRideOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 20, 90, 90]); }
+euc.cmd.getSpectrum = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 20, 90, 90]); } // to b checked
+euc.cmd.setSpectrumOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 20, 90, 90]); }
+euc.cmd.getSpectrumMode = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 20, 90, 90]); }
+euc.cmd.setSpectrumMode = function(val) { return E.toUint8Array([170, 85, val ? val : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 151, 20, 90, 90]); }
+	//BT music mode
+euc.cmd.getBTMusic = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 20, 90, 90]); }
+euc.cmd.setBTMusicOnOff = function(val) { return E.toUint8Array([170, 85, val ? 1 : 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 20, 90, 90]); }
+	//voice
+euc.cmd.getVoice = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 20, 90, 90]); }
+euc.cmd.setVoiceOnOff = function(val) { return E.toUint8Array([170, 85, val ? val : 0, val ? 0 : 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 20, 90, 90]); }
+euc.cmd.setVoiceVolUp = function() { return E.toUint8Array([170, 85, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90]); }
+euc.cmd.setVoiceVolDn = function() { return E.toUint8Array([170, 85, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 20, 90, 90]); }
+	//gyro
+euc.cmd.doCalibrate = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 137, 20, 90, 90]); }
+euc.cmd.getCalibrateTilt = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90]); }
+euc.cmd.setCalibrateTilt = function(val) { return E.toUint8Array([170, 85, 1, 0, val & 255, (val >> 8) & 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 138, 20, 90, 90]); }
+	//ride mode 0=hard,1=med,2=soft
+euc.cmd.setRideMode = function(val) { return E.toUint8Array([170, 85, val ? val : 0, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 20, 90, 90]); }
+euc.cmd.getRideParamA = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 146, 20, 90, 90]); }
+euc.cmd.getRideParamB = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 147, 20, 90, 90]); }
+euc.cmd.getRideParamC = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 20, 90, 90]); }
+	//lock
+euc.cmd.doLockOnce = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 20, 90, 90]); }
+euc.cmd.getLockOnce = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 20, 90, 90]); }
+euc.cmd.doLock = function() { return E.toUint8Array([170, 85, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 93, 20, 90, 90]); }
+euc.cmd.getLock = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 20, 90, 90]); }
+euc.cmd.getPass = function() { return E.toUint8Array([170, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 20, 90, 90]); }
+euc.cmd.setPass = function() { return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 20, 90, 90]); }
+euc.cmd.setPassClear = function() { return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 20, 90, 90]); }
+euc.cmd.setPassSend = function() { return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 20, 90, 90]); }
+euc.cmd.setPassChange = function() { return E.toUint8Array([170, 85, 48 + Number(euc.dash.opt.lock.pass[0]), 48 + Number(euc.dash.opt.lock.pass[1]), 48 + Number(euc.dash.opt.lock.pass[2]), 48 + Number(euc.dash.opt.lock.pass[3]), 48 + Number(euc.dash.opt.lock.passOld[0]), 48 + Number(euc.dash.opt.lock.passOld[1]), 48 + Number(euc.dash.opt.lock.passOld[2]), 48 + Number(euc.dash.opt.lock.passOld[3]), 0, 0, 0, 0, 0, 0, 65, 20, 90, 90]); } //rf 43
+euc.cmd.setSpeedLimits = function() { return E.toUint8Array([170, 85, euc.dash.alrt.spd.one.en ? euc.dash.alrt.spd.one.val : 0, 0, euc.dash.alrt.spd.two.en ? euc.dash.alrt.spd.two.val : 0, 0, euc.dash.alrt.spd.thre.val, 0, euc.dash.alrt.spd.tilt.val, 0, 49, 50, 51, 52, 53, 54, 133, 20, 90, 90]); }
 euc.cmd = function(no, val) {
+	switch (no) {
+		case "manual":
+		case "doUnlock": return val;
+		case "getModel": return euc.cmd.getModel();
+		case "getSerial": return euc.cmd.getSerial();
+		case "getAlarms": return euc.cmd.getAlarms();
+		case "doHorn": return euc.cmd.doHorn();
+		case "doBeep": return euc.cmd.doBeep();
+		case "setLiftOnOff": return euc.cmd.setLiftOnOff(val);
+		case "getPowerOff": return euc.cmd.getPowerOff();
+		case "setPowerOff": return euc.cmd.setPowerOff(val);
+		case "doPowerOff": return euc.cmd.doPowerOff();
+		case "setLights": return euc.cmd.setLights(val);
+		case "getStrobe": return euc.cmd.getStrobe();
+		case "setStrobeOnOff": return euc.cmd.setStrobeOnOff(val);
+		case "getLedMagic": return euc.cmd.getLedMagic();
+		case "setLedMagicOnOff": return euc.cmd.setLedMagicOnOff(val);
+		case "getLedRide": return euc.cmd.getLedRide();
+		case "setLedRideOnOff": return euc.cmd.setLedRideOnOff(val);
+		case "getSpectrum": return euc.cmd.getSpectrum();
+		case "setSpectrumOnOff": return euc.cmd.setSpectrumOnOff(val);
+		case "getSpectrumMode": return euc.cmd.getSpectrumMode();
+		case "setSpectrumMode": return euc.cmd.setSpectrumMode(val);
+		case "getBTMusic": return euc.cmd.getBTMusic();
+		case "setBTMusicOnOff": return euc.cmd.setBTMusicOnOff(val);
+		case "getVoice": return euc.cmd.getVoice();
+		case "setVoiceOnOff": return euc.cmd.setVoiceOnOff(val);
+		case "setVoiceVolUp": return euc.cmd.setVoiceVolUp();
+		case "setVoiceVolDn": return euc.cmd.setVoiceVolDn();
+		case "doCalibrate": return euc.cmd.doCalibrate();
+		case "getCalibrateTilt": return euc.cmd.getCalibrateTilt();
+		case "setCalibrateTilt": return euc.cmd.setCalibrateTilt(val);
+		case "setRideMode": return euc.cmd.setRideMode(val);
+		case "getRideParamA": return euc.cmd.getRideParamA();
+		case "getRideParamB": return euc.cmd.getRideParamB();
+		case "getRideParamC": return euc.cmd.getRideParamC();
+		case "doLockOnce": return euc.cmd.doLockOnce();
+		case "getLockOnce": return euc.cmd.getLockOnce();
+		case "doLock": return euc.cmd.doLock();
+		case "getLock": return euc.cmd.getLock();
+		case "getPass": return euc.cmd.getPass();
+		case "setPass": return euc.cmd.setPass();
+		case "setPassClear": return euc.cmd.setPassClear();
+		case "setPassSend": return euc.cmd.setPassSend();
+		case "setPassChange": return euc.cmd.setPassChange();
+		case "setSpeedLimits": return euc.cmd.setSpeedLimits();
+	}
+		return E.toUint8Array([]);
+}
+/* euc.cmd = function(no, val) {
 	switch (no) {
 		//euc.wri("getParamA");
 		case "manual": return val;
@@ -62,6 +165,7 @@ euc.cmd = function(no, val) {
 		default: return E.toUint8Array([]);
 	}
 };
+*/
 euc.temp.city = function() {
 	// "ram";
 	if (euc.dash.live.amp < -1 && euc.dash.opt.lght.HL === 1) {
