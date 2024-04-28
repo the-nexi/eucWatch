@@ -40,7 +40,7 @@ face[0] = {
 		if (euc.state=="READY") {
 			this.g.setColor(0,0);
 			if(euc.state!=this.conn) {
-                                this.conn=euc.state;
+                this.conn=euc.state;
 				this.g.fillRect(0,0,239,239);
 			}
 			this.g.flip();
@@ -50,14 +50,14 @@ face[0] = {
 				this.alF();
 				this.bar=0;
 			} else if ((5<=this.spd || 50<=this.topP) && euc.dash.info.get.makr=="Kingsong" || euc.dash.info.get.makr=="Veteran"){
-				if (this.pwm!=euc.dash.live.pwm) {this.pwm=euc.dash.live.pwm; this.pwmF();}
-				if (this.topP!=euc.dash.trip.pwm) {this.topP=euc.dash.trip.pwm; this.pwmMF();}
+				if (this.pwm!=Math.round(euc.dash.live.pwm)) this.pwmF();
+				if (this.topP!=Math.round(euc.dash.trip.pwm)) this.pwmMF();
 			} else if (!this.bar) { this.topP=-1; this.bar=1; this.barF();}
 			//tmp/amp block
 			if (!ew.def.dash.amp) {
 				if (this.amp!=Math.round(euc.dash.live.amp)) this.ampF();
 			}else
-				if (this.tmp!=Math.round(euc.dash.live.tmp))	this.tmpF();
+				if (this.tmp!=Math.round(euc.dash.live.tmp)) this.tmpF();
 			//alarm block
 			if (this.buzz!=euc.is.buzz) this.buzF();
 			//spdMspeed block
@@ -123,8 +123,8 @@ face[0] = {
 		this.g.setColor(0,(euc.dash.alrt.spd.cc==1)?0:this.spdC[euc.dash.alrt.spd.cc]);
 		this.g.fillRect(43,54,197,170);
 		this.g.setColor(1,(euc.dash.alrt.spd.cc==1)?14:15);
-		if (100 <= this.spd) this.g.setFontVector(80);
-		else this.g.setFontVector(130);
+		if (this.spd < 100) this.g.setFontVector(130);
+		else this.g.setFontVector(80);
 		this.g.drawString(Math.round(this.spd*this.fact),129-(this.g.stringWidth(Math.round(this.spd*this.fact))/2),(100 <= this.spd)?75:57);
 		this.g.flip();
 		if (this.spd==0 && this.topP<50) {
@@ -144,34 +144,37 @@ face[0] = {
 	},
 	pwmF: function(){
 		"ram";
-		this.g.setColor(0,euc.dash.alrt.pwm.hapt.hi<=euc.dash.live.pwm?13:1);
+		this.pwm=Math.round(euc.dash.live.pwm);
+		this.g.setColor(0,(euc.dash.alrt.pwm.hapt.hi<=this.pwm)?13:1);
 		this.g.fillRect(0,176,191,200);
-		this.g.setColor(1,50<=euc.dash.live.pwm?14:15);
+		this.g.setColor(1,(50<=this.pwm)?14:15);
 		this.g.setFontVector(23);
-		this.g.drawString(euc.dash.live.pwm,44-this.g.stringWidth(euc.dash.live.pwm),178);
+		this.g.drawString(this.pwm,44-this.g.stringWidth(this.pwm),178);
 		this.g.setFontVector(14);
 		this.g.drawString("%",45,178);
-		this.g.fillRect(59,180,59+euc.dash.live.pwm*1.32,187);
+		this.g.fillRect(59,180,59+this.pwm*1.32,187);
 		this.g.flip();
 	},
 	pwmMF: function(){
-		this.g.setColor(0,euc.dash.alrt.pwm.hapt.hi<=euc.dash.trip.pwm?13:1);
+		this.topP=Math.round(euc.dash.trip.pwm);
+		this.g.setColor(0,euc.dash.alrt.pwm.hapt.hi<=this.topP?13:1);
 		this.g.fillRect(192,176,239,200);
 		this.g.setFontVector(23);
-		this.g.setColor(1,50<=euc.dash.trip.pwm?14:15);
+		this.g.setColor(1,50<=this.topP?14:15);
 		this.g.setFontVector(23);
-		this.g.drawString(euc.dash.trip.pwm,239-this.g.stringWidth(euc.dash.trip.pwm),178);
+		this.g.drawString(this.topP,239-this.g.stringWidth(this.topP),178);
 		this.g.flip();
 	},
 	ampF: function(){
 		this.amp=Math.round(euc.dash.live.amp);
+		let ampDisp=this.amp|0;
 		this.g.setColor(0,this.ampC[euc.dash.alrt.amp.cc]);
 		this.g.fillRect(0,53,40,112);
 		this.g.setColor(1,15);
 		this.g.setFontVector(10);
 		this.g.drawString("AMP", 11,59);
-		this.g.setFontVector(29);
-		this.g.drawString(this.amp|0, 22-(this.g.stringWidth(this.amp|0)/2),80);
+		this.g.setFontVector((ampDisp<100)?29:20);
+		this.g.drawString(ampDisp, 22-(this.g.stringWidth(ampDisp)/2),(ampDisp<100)?80:85);
 		this.g.flip();
 	},
 	tmpF: function(){
@@ -182,8 +185,8 @@ face[0] = {
 		this.g.setFontVector(10);
 		this.g.drawString("TEMP", 7,59);
 		let temp=(ew.def.dash.farn)?Math.round(this.tmp*1.8+32):Math.round(this.tmp);
-		this.g.setFontVector((100<temp)?20:29);
-		this.g.drawString(Math.round(this.tmp), 22-(this.g.stringWidth(Math.round(this.tmp))/2),80);
+		this.g.setFontVector((temp<100)?29:20);
+		this.g.drawString(tmp, 22-(this.g.stringWidth(temp)/2),(temp<100)?80:85);
 		this.g.flip();
 	},
 	buzF: function(){
@@ -207,17 +210,19 @@ face[0] = {
 	},
 	spMF: function(){
 		this.topS=euc.dash.trip.topS.toFixed(1);
+		let topSdisp=Math.round(this.topS*this.fact);
 		this.g.setColor(0,1);
 		this.g.fillRect(200,53,239,112);
 		this.g.setColor(1,15);
 		this.g.setFontVector(10);
 		this.g.drawString("TOP", 210,59);
-		this.g.setFontVector(29);
-		this.g.drawString(Math.round(this.topS*this.fact), 222-(this.g.stringWidth(Math.round(this.topS*this.fact))/2),80);
+		this.g.setFontVector((topSdisp<100)?29:21);
+		this.g.drawString(topSdisp, 221-(this.g.stringWidth(topSdisp)/2),(topSdisp<100)?80:85);
 		this.g.flip();
 	},
 	limF: function(){
 		this.aTlt=euc.dash.alrt.spd.max;
+		let aTlTdisp=Math.round(this.aTlt*this.fact);
 		//if (euc.dash.info.get.makr=="Begode") this.g.setColor(0,(euc.dash.alrt.spd.tilt.val<=this.aTlt)?1:13);
 		//else
 		this.g.setColor(0,(euc.dash.live.spd+5<=this.aTlt)?1:13);
@@ -225,8 +230,8 @@ face[0] = {
 		this.g.setColor(1,15);
 		this.g.setFontVector(10);
 		this.g.drawString("LIMIT", 207,120);
-		this.g.setFontVector(29);
-		this.g.drawString(Math.round(this.aTlt*this.fact), 222-(this.g.stringWidth(Math.round(this.aTlt*this.fact))/2),140);
+		this.g.setFontVector((aTlTdisp<100)?29:20);
+		this.g.drawString(aTlTdisp, 221-(this.g.stringWidth(aTlTdisp)/2),(aTlTdisp<100)?140:145);
 		this.g.flip();
 	},
 	alrF: function(){

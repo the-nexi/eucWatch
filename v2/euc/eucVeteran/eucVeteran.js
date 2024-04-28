@@ -75,7 +75,7 @@ euc.temp.liveParse = function (inc){
   if (!euc.dash.info.get.modl) euc.dash.info.get.modl=lala.getUint16(28);
   euc.dash.opt.ride.mode=lala.getUint16(30);
   //pwm
-  euc.dash.live.pwm=lala.getUint16(34)/100;
+  euc.dash.live.pwm=Math.round(lala.getUint16(34)/100);
   if (euc.dash.trip.pwm < euc.dash.live.pwm) euc.dash.trip.pwm = euc.dash.live.pwm;
   //alerts
   if (euc.dash.alrt.pwm.hapt.en && (euc.dash.alrt.pwr || euc.dash.alrt.pwm.hapt.hi <= euc.dash.live.pwm)) {
