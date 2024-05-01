@@ -14,6 +14,7 @@ E.setFlags({ pretokenise: 1 });
   control=96;
 */
 euc.cmd=function(no,val){
+  if (ew.is.bt===2 && 2<euc.dbg) console.log("euc.cmd(", no, ",", val, ")");
   let cmd;
   euc.temp.last=no;
   switch (no) {
@@ -410,7 +411,7 @@ euc.temp.keepAlive = function() {
   });
   euc.temp.keepAlive.state++;
   if(euc.temp.keepAlive.state < 7) return;
-  if(getTime() - euc.is.lastGetStats < 1) euc.temp.keepAlive.state = 6;
+  if((getTime() - euc.is.lastGetStats) < 1) euc.temp.keepAlive.state = 6;
   else euc.temp.keepAlive.state = 5;
 };
 
