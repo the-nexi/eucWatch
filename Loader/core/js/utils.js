@@ -63,36 +63,36 @@ let DEVICEINFO = [{
     id: "MAGIC3",
     name: "Magic3-Rock",
     features: ["ROCK", "V2", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/Magic3.jpg"
+    img: "tools/assets/images/Magic3.jpg"
   },
   {
     id: "BANGLEJS2",
     name: "BANGLE 2",
     features: ["BANGLEJS2", "V2", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/bangle2.jpg"
+    img: "tools/assets/images/bangle2.jpg"
   },
   {
     id: "P8",
     name: "P8-P22-pineTime",
     features: ["P8", "V1", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/p8.jpg"
+    img: "tools/assets/images/p8.jpg"
   }, {
     id: "P22",
     name: "P22 B1/D",
     features: ["P22B", "V1", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/p22.jpg"
+    img: "tools/assets/images/p22.jpg"
   },
   {
     id: "DSD6",
     name: "DSD6",
     features: ["DSD6", "V1", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/dsd6.jpg"
+    img: "tools/assets/images/dsd6.jpg"
   },
   {
     id: "EUCLIGHT",
     name: "eucLight",
     features: ["DSD6", "V1", "EW"],
-    img: "https://loader.eucwatch.com/tools/assets/images/eucLight.jpg"
+    img: "tools/assets/images/eucLight.jpg"
   }
 ];
 
