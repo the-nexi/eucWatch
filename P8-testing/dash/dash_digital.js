@@ -186,7 +186,7 @@ face[0] = {
 		this.g.drawString("TEMP", 7,59);
 		let temp=(ew.def.dash.farn)?Math.round(this.tmp*1.8+32):Math.round(this.tmp);
 		this.g.setFontVector((temp<100)?29:20);
-		this.g.drawString(tmp, 22-(this.g.stringWidth(temp)/2),(temp<100)?80:85);
+		this.g.drawString(temp, 22-(this.g.stringWidth(temp)/2),(temp<100)?80:85);
 		this.g.flip();
 	},
 	buzF: function(){
