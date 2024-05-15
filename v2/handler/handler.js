@@ -69,10 +69,11 @@ if (require('Storage').read("handler_cron")) eval(require('Storage').read("handl
 //theme
 //if (require('Storage').read("handlerTheme")) eval(require('Storage').read("handlerTheme"));
 shutdown = function (v) {
+    ew.do.update.settings();
     acc.off();
-    face.off();
+    face.go("clock",-1);
+    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 300);
     setTimeout(()=>{
-        digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 300);
         poke32(0x40000500,1); // System Off
     }, 500)
 }
