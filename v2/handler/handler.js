@@ -68,14 +68,12 @@ if (process.env.BOARD == "P8" || process.env.BOARD == "P22") {
 if (require('Storage').read("handler_cron")) eval(require('Storage').read("handler_cron"));
 //theme
 //if (require('Storage').read("handlerTheme")) eval(require('Storage').read("handlerTheme"));
-shutdown = function (v) {
-    ew.do.update.settings();
-    //acc.off();
-    ew.def.acc=0;
-	ew.do.update.acc();
-    face.go("clock",-1);
-    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 300);
-    setTimeout(()=>{
-        poke32(0x40000500,1); // System Off
-    }, 1000)
-}
+//shutdown = function (v) {
+//    ew.do.update.settings();
+//    acc.off();
+//    face.go("clock",-1);
+//    digitalPulse(ew.pin.BUZZ, ew.pin.BUZ0, 300);
+//    setTimeout(()=>{
+//        poke32(0x40000500,1); // System Off
+//    }, 1000)
+//}
