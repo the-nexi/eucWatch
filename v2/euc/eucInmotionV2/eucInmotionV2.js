@@ -89,11 +89,12 @@ function validateChecksum(buffer) {
   let calculatedChecksum = array.reduce(checksum)&0xFF;
   return receivedChecksum == calculatedChecksum;
 };
-function getModelName(id) {
+euc.temp.getModelName = function (id) {
   switch (id) {
     case 6: euc.temp.parseLive = euc.temp.parseLiveV11v2; return "V11";
     case 7: euc.temp.parseLive = euc.temp.parseLiveV12; return "V12";
     case 8: euc.temp.parseLive = euc.temp.parseLiveV13; return "V13";
+    case 9: euc.temp.parseLive = euc.temp.parseLiveV13; return "V14";
   }
   return "UNKNOWN";
 };
@@ -107,7 +108,7 @@ euc.temp.parseMainInfo = function (inc) {
     // 020701010100 -v12
     // 020801010100 -v13
     let series = lala.getUint8(7);
-    euc.dash.info.get.modl=getModelName(series);
+    euc.dash.info.get.modl=euc.temp.getModelName(series);
     euc.dash.info.get.makr = "Inmotion";
     euc.dash.info.get.mac = euc.mac;
     if (!ew.do.fileRead("dash","slot"+ew.do.fileRead("dash","slot")+"Name") || ew.do.fileRead("dash","slot"+ew.do.fileRead("dash","slot")+"Name") != euc.dash.info.get.modl)
@@ -218,10 +219,10 @@ euc.temp.parseLiveV12 = function (inc) {
 };
 //
 euc.temp.parseLiveV13 = function (inc) {
-  if (ew.is.bt==2) console.log("Parse realtime data (V13)");
+  if (ew.is.bt==2) console.log("Parse realtime data (V13/14)");
   let lala = new DataView(inc);
   let dataLen = lala.getUint8(3);
-  if (dataLen<62) {
+  if (dataLen<65) {
     if (ew.is.bt===2) console.log("Short package. dataLen=", dataLen.toString(10));
     return;
   }
@@ -231,16 +232,43 @@ euc.temp.parseLiveV13 = function (inc) {
   euc.dash.live.amp = lala.getInt16(7, true) / 100;
   //speed
   euc.dash.live.spd = Math.abs(lala.getInt16(13, true) / 100);
+  //pwm
+  euc.dash.live.pwm = lala.getInt16(19, true);
   //temp
   // mosfet temp
   euc.dash.live.tmp = lala.getUint8(63) - 176;
   // battery temp
-  euc.dash.live.tmp2 = lala.getUint8(65) - 176;
+  euc.dash.live.tmp2 = lala.getUint8(64) - 176;
   euc.temp.liveAll();
 };
 //
+//euc.temp.parseLiveV14 = function (inc) {
+//  if (ew.is.bt==2) console.log("Parse realtime data (V14)");
+//  let lala = new DataView(inc);
+//  let dataLen = lala.getUint8(3);
+//  if (dataLen<65) {
+//    if (ew.is.bt===2) console.log("Short package. dataLen=", dataLen.toString(10));
+//    return;
+//  }
+//  //volt
+//  euc.dash.live.volt = lala.getUint16(5, true) / 100;
+//  //amp
+//  euc.dash.live.amp = lala.getInt16(7, true) / 100;
+//  //speed
+//  euc.dash.live.spd = Math.abs(lala.getInt16(13, true) / 100);
+//  //pwm
+//  euc.dash.live.pwm = lala.getInt16(19, true);
+//  //temp
+//  // mosfet temp
+//  euc.dash.live.tmp = lala.getUint8(63) - 176;
+//  // battery temp
+//  euc.dash.live.tmp2 = lala.getUint8(64) - 176;
+//  euc.temp.liveAll();
+//};
+//
 euc.temp.liveAll = function () {
   euc.is.lastGetLive = getTime();
+  euc.is.alert=0;
   //batt
   euc.dash.live.bat = Math.round(100*(euc.dash.live.volt*(100/euc.dash.opt.bat.pack) - euc.dash.opt.bat.low ) / (euc.dash.opt.bat.hi-euc.dash.opt.bat.low));
   euc.log.batL.unshift(euc.dash.live.bat);
@@ -263,7 +291,6 @@ euc.temp.liveAll = function () {
     if (euc.dash.alrt.amp.hapt.hi<=euc.dash.live.amp)	euc.is.alert =  euc.is.alert + 1 + Math.round( (euc.dash.live.amp - euc.dash.alrt.amp.hapt.hi) / euc.dash.alrt.amp.hapt.step) ;
     else euc.is.alert =  euc.is.alert + 1 + Math.round(-(euc.dash.live.amp - euc.dash.alrt.amp.hapt.low) / euc.dash.alrt.amp.hapt.step) ;
   }
-  euc.is.alert=0;
   //alarm
   euc.dash.alrt.pwr=0;
   //log
@@ -313,19 +340,41 @@ euc.temp.parseStats = function (inc) {
   if (2<euc.dbg) print("ride time :", euc.dash.timR);
 };
 //
-crutchDoubleA5 = function(buf) {
-  let len = buf.length;
-  let needLen = buf[3] + 5;
-  if (len === needLen) return buf;
-  let oldByte = 0x00;
-  let p = 0;
-  let newArr = new Uint8Array(needLen);
-  for (i = 0; i < Len; i++) {
-    if (p >= needlen) break;
-    if (oldByte === 0xA5 && buf[i] === 0xA5) continue;
-    newArr[p] = buf[i];
+euc.temp.crutchDoubleA5 = function(buf) {
+  let len = buf.length,
+      oldByte = 0x00,
+      flag = 0x00,
+      p = 0,
+      i = 0,
+      needLen = 0;
+  while (i < len && p < 3) {
+    if (buf[i] != 0xA5 || oldByte == 0xA5){
+      switch (p) {
+        case 2:
+          needLen = buf[i] + 5;
+          p++;
+          break;
+        case 1:
+          flag = buf[i];
+          p++;
+          break;
+        case 0:
+          if (buf[i] == 0xAA && oldByte == 0xAA) p++;
+      }
+    }
     oldByte = buf[i];
-    p++;
+    i++;
+  }
+  if (len === needLen) return buf;
+  let newArr = new Uint8Array(needLen);
+  newArr.set([0xAA, 0xAA, flag, oldByte]);
+  p = 4;
+  while (i < len && p < needLen) {
+    if (buf[i] != 0xA5 || oldByte == 0xA5){
+      newArr[p] = buf[i];
+      p++;
+    } else oldByte = buf[i];
+    i++;
   }
   if (ew.is.bt===2&&euc.dbg==3) console.log("InmotionV2: in after crutch: length: ", needLen, " data: ",[].map.call(newArr, x => x.toString(16)).toString());
   return newArr;
@@ -347,7 +396,7 @@ euc.temp.inpk = function(event) {
   delete euc.temp.last;
   if (euc.temp.tot.buffer.length > needBufLen) {
     if (ew.is.bt===2) console.log("InmotionV2: Packet size error. Trying a crutch.");
-    euc.temp.tot = crutchDoubleA5(euc.temp.tot);
+    euc.temp.tot = euc.temp.crutchDoubleA5(euc.temp.tot);
   }
   if (ew.is.bt===2) console.log("InmotionV2: in: length: ",euc.temp.tot.buffer.length," data: ",[].map.call(euc.temp.tot, x => x.toString(16)).toString());
   // Check packet
