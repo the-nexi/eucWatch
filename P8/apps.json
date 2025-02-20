@@ -487,5 +487,16 @@
 		"storage": [
 			{"name":"hello","url":"hello.js"}
 		]
+	},
+	{ "id": "autolights",
+		"name": "Auto Lights",
+		"icon": "icon.png",
+		"version":"0.01",
+		"description": "Automatically controls EUC lights based on speed",
+		"tags": "euc,lights,automation",
+		"readme": "README.md",
+		"storage": [
+			{"name":"autolights","url":"autolights.js"}
+		]
 	}
 ]
